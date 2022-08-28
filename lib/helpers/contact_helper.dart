@@ -41,34 +41,86 @@ class ContactHelper {
           "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT, $phoneColumn TEXT, $imgColumn TEXT)");
     });
   }
-}
 
-Future<Contact> saveContact(Contact contact) async {
-  // ignore: unused_local_variable, prefer_typing_uninitialized_variables
-  var db;
-  Database dbContact = await db;
-  contact.id = await dbContact.insert(
-    contactTable,
-    contact.toMap(),
-  );
-  return contact;
-}
+  Future<Contact> saveContact(Contact contact) async {
+    // ignore: unused_local_variable, prefer_typing_uninitialized_variables
+    var db;
+    Database dbContact = await db;
+    contact.id = await dbContact.insert(
+      contactTable,
+      contact.toMap(),
+    );
+    return contact;
+  }
 
-// ignore: missing_return
-Future<Contact> getContact(int id) async {
-  // ignore: prefer_typing_uninitialized_variables
-  var db;
-  Database dbContact = await db;
-  // ignore: unused_local_variable
-  List<Map> maps = await dbContact.query(contactTable,
-      columns: [idColumn, nameColumn, emailColumn, phoneColumn, imgColumn],
-      where: "$idColumn = ?",
-      whereArgs: [id]);
-  // ignore: prefer_is_empty
-  if (maps.length > 0) {
-    return Contact.fromMap(maps.first);
-  } else {
-    return null;
+  // ignore: missing_return
+  Future<Contact> getContact(int id) async {
+    // ignore: prefer_typing_uninitialized_variables
+    var db;
+    Database dbContact = await db;
+    // ignore: unused_local_variable
+    List<Map> maps = await dbContact.query(contactTable,
+        columns: [idColumn, nameColumn, emailColumn, phoneColumn, imgColumn],
+        where: "$idColumn = ?",
+        whereArgs: [id]);
+    // ignore: prefer_is_empty
+    if (maps.length > 0) {
+      return Contact.fromMap(maps.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<int> deleteContact(int id) async {
+    // ignore: prefer_typing_uninitialized_variables
+    var db;
+    // ignore: unused_local_variable
+    Database dbContact = await db;
+    return await dbContact
+        .delete(contactTable, where: "$idColumn = ?", whereArgs: [id]);
+  }
+
+  Future<int> updateContact(Contact contact) async {
+    // ignore: prefer_typing_uninitialized_variables
+    var db;
+    // ignore: unused_local_variable
+    Database dbContact = await db;
+    return await dbContact.update(contactTable, contact.toMap(),
+        where: "$idColumn = ?", whereArgs: [contact.id]);
+  }
+
+  Future<List> getAllContact() async {
+    // ignore: prefer_typing_uninitialized_variables
+    var db;
+    // ignore: unused_local_variable
+    Database dbContact = await db;
+    // ignore: unused_local_variable
+    List listMap = await dbContact.rawQuery("SELECT * FROM $contactTable");
+    // ignore: unused_local_variable
+    List<Contact> listContact = [];
+    for (Map m in listMap) {
+      listContact.add(
+        Contact.fromMap(m),
+      );
+    }
+    return listContact;
+  }
+
+  Future<int> gerNumber() async {
+    // ignore: prefer_typing_uninitialized_variables
+    var db;
+    // ignore: unused_local_variable
+    Database dbContact = await db;
+    return Sqflite.firstIntValue(
+        await dbContact.rawQuery("SELECT COUNT(*) FROM $contactTable"));
+  }
+
+  Future close() async {
+    // ignore: prefer_typing_uninitialized_variables
+    var db;
+    // ignore: unused_local_variable
+    Database dbContact = await db;
+    dbContact.close();
   }
 }
 
