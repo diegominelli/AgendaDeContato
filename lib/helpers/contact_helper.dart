@@ -43,6 +43,35 @@ class ContactHelper {
   }
 }
 
+Future<Contact> saveContact(Contact contact) async {
+  // ignore: unused_local_variable, prefer_typing_uninitialized_variables
+  var db;
+  Database dbContact = await db;
+  contact.id = await dbContact.insert(
+    contactTable,
+    contact.toMap(),
+  );
+  return contact;
+}
+
+// ignore: missing_return
+Future<Contact> getContact(int id) async {
+  // ignore: prefer_typing_uninitialized_variables
+  var db;
+  Database dbContact = await db;
+  // ignore: unused_local_variable
+  List<Map> maps = await dbContact.query(contactTable,
+      columns: [idColumn, nameColumn, emailColumn, phoneColumn, imgColumn],
+      where: "$idColumn = ?",
+      whereArgs: [id]);
+  // ignore: prefer_is_empty
+  if (maps.length > 0) {
+    return Contact.fromMap(maps.first);
+  } else {
+    return null;
+  }
+}
+
 class Contact {
   int id;
   String name;
