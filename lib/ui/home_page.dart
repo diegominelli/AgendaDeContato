@@ -1,6 +1,9 @@
-import 'dart:io';
+// import 'dart:io';
+
+// ignore_for_file: unused_element
 
 import 'package:agenda_de_contato/helpers/contact_helper.dart';
+import 'package:agenda_de_contato/ui/contact_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,11 +22,7 @@ class _MyWidgetState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    helper.getAllContacts().then((list) {
-      setState(() {
-        contacts = list;
-      });
-    });
+    _getAllContacts();
   }
 
   @override
@@ -36,7 +35,9 @@ class _MyWidgetState extends State<HomePage> {
       ),
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          _showContactPage();
+        },
         backgroundColor: Colors.red,
         child: const Icon(Icons.add),
       ),
@@ -50,7 +51,6 @@ class _MyWidgetState extends State<HomePage> {
     );
   }
 
-  // ignore: unused_element
   Widget _contactCard(BuildContext context, int index) {
     return GestureDetector(
       child: Card(
@@ -61,13 +61,13 @@ class _MyWidgetState extends State<HomePage> {
               Container(
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: contacts[index].img != null
-                        ? FileImage(File(contacts[index].img))
-                        : const AssetImage("images/person.png"),
-                  ),
+                  // image: DecorationImage(
+                  //   image: contacts[index].img != null
+                  //       ? FileImage(File(contacts[index].img))
+                  //       : const AssetImage("images/person.png"),
+                  // ),
                 ),
               ),
               Padding(
@@ -95,6 +95,37 @@ class _MyWidgetState extends State<HomePage> {
           ),
         ),
       ),
+      onTap: () {
+        _showContactPage(contact: contacts[index]);
+      },
     );
+  }
+
+  void _showContactPage({Contact contact}) async {
+    final recContact = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContactPage(
+          contact: contact,
+        ),
+      ),
+    );
+
+    if (recContact != null) {
+      if (contact != null) {
+        await helper.updateContact(recContact);
+      } else {
+        await helper.saveContact(recContact);
+      }
+      _getAllContacts();
+    }
+  }
+
+  void _getAllContacts() {
+    helper.getAllContacts().then((list) {
+      setState(() {
+        contacts = list;
+      });
+    });
   }
 }
