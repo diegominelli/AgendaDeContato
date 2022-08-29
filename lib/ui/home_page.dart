@@ -66,7 +66,7 @@ class _MyWidgetState extends State<HomePage> {
                   image: DecorationImage(
                     image: contacts[index].img != null
                         ? FileImage(File(contacts[index].img))
-                        : const AssetImage("images/person.jpg"),
+                        : const AssetImage("images/person.png"),
                   ),
                 ),
               ),
